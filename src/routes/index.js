@@ -1,5 +1,7 @@
+'use strict';
+
 var getIndex = function(req,res){
-  console.log('hello');
+  res('<h1>Credit Union Search Tool</h1>');
 };
 
 var index = {

@@ -1,3 +1,5 @@
+'use strict';
+
 var Hapi = require('hapi');
 var Good = require('good');
 var config = require('./config/constants');
@@ -9,14 +11,10 @@ server.connection({
 });
 
 var home = require('./routes/index');
-var assets = require('./routes/assets');
-var state = require('./routes/state');
-var memberCount = require('./routes/memberCount');
+var api = require('./routes/api');
 
 server.route(home);
-server.route(memberCount);
-server.route(state);
-server.route(assets);
+server.route(api);
 
 var goodConfig = {
   register: Good,
@@ -25,7 +23,9 @@ var goodConfig = {
       reporter: require('good-console'),
       events: {
         response: '*',
-        log: '*'
+        log: '*',
+        error: '*',
+        request: '*'
       }
     }]
   }
@@ -40,4 +40,3 @@ server.register(goodConfig, function (err) {
     console.log('Server running at:', server.info.uri);
   });
 });
-
