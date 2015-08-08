@@ -10,4 +10,10 @@ state, and asset size.
 
 Navigate your browser to localhost:3000
 
+### Additional Information
 See: http://www.ncua.gov/dataapps/pages/default.aspx
+
+### Dependencies
+good
+good-console
+hapi
