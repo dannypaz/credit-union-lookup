@@ -1,5 +1,6 @@
 var Hapi = require('hapi');
 var Good = require('good');
+var config = require('./config/constants');
 
 var server = new Hapi.Server();
 
