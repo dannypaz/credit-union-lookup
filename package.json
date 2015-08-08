@@ -1,0 +1,22 @@
+{
+  "name": "credit-union-lookup",
+  "version": "1.0.0",
+  "description": "Hapi service for parsing NCUA data",
+  "main": "server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dannypaz/credit-union-lookup.git"
+  },
+  "author": "dannypaz",
+  "license": "GNU GPL v3",
+  "bugs": {
+    "url": "https://github.com/dannypaz/credit-union-lookup/issues"
+  },
+  "homepage": "https://github.com/dannypaz/credit-union-lookup",
+  "dependencies": {
+    "hapi": "^8.8.1"
+  }
+}
