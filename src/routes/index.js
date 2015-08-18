@@ -1,6 +1,6 @@
 'use strict';
 
-var getIndex = function(req,res){
+var getIndex = function(req, res){
   res('<h1>Credit Union Search Tool</h1>');
 };
 

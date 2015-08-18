@@ -1,8 +1,7 @@
 'use strict';
 
 var Hapi = require('hapi');
-var Good = require('good');
-var config = require('./config/constants');
+var config = require('./config/config');
 
 var server = new Hapi.Server();
 
@@ -12,29 +11,19 @@ server.connection({
 
 var home = require('./routes/index');
 var api = require('./routes/api');
+var init = require('./routes/init');
 
 server.route(home);
 server.route(api);
+server.route(init);
 
-var goodConfig = {
-  register: Good,
-  options: {
-    reporters: [{
-      reporter: require('good-console'),
-      events: {
-        response: '*',
-        log: '*',
-        error: '*',
-        request: '*'
-      }
-    }]
-  }
-};
+var serverConfig = [
+  config.good,
+  config.mongo
+];
 
-server.register(goodConfig, function (err) {
-  if (err) {
-    throw err; // couldn't load plugin
-  }
+server.register(serverConfig, function (err) {
+  if (err) throw err; // Couldn't load
 
   server.start(function () {
     console.log('Server running at:', server.info.uri);

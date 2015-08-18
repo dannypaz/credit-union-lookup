@@ -14,6 +14,13 @@ Navigate your browser to localhost:3000
 See: http://www.ncua.gov/dataapps/pages/default.aspx
 
 ### Dependencies
+
 good
+
 good-console
+
 hapi
+
+### Considerations
+
+Could consider using Boom for http

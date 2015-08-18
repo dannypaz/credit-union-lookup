@@ -1,18 +1,17 @@
 'use strict';
 
+// This will init all data from CSV to mongo
+
 var cu_data = function(req,res){
   var db = req.server.plugins['hapi-mongodb'].db;
 
-  db.collection('credit_unions').findAll(function(err, rows){
-    if (err) res.send('error');
-    // return all data here
-    res('done');
-  });
+  // Add data
+  res('Done!');
 };
 
 var routes = {
   method: 'GET',
-  path: '/api',
+  path: '/api/init',
   handler: getApi
 };
 
