@@ -3,9 +3,14 @@
 // This section will initalize all data from the CSV
 // in ./data/cu.txt to Mongo (or your configured database)
 var mongoose = require('mongoose');
-var fs = require('fs');
 var path = require('path');
 var parse = require('csv-parse');
+var LineByLineReader = require('line-by-line');
+
+var escapeString = function(str){
+  var strCopy = str.replace('\"', "").replace('"', "");
+  return strCopy;
+};
 
 var readFile = function(filePath, callback){
   var response = [];
@@ -15,44 +20,52 @@ var readFile = function(filePath, callback){
     newline: '\n'
   };
 
-  var parser = parse(parseOptions, function(err, data){
-    if (data){
-      for(var i=0;i<data.length;i++){
-        if (firstLineExists){
-          firstLineExists = false;
-          continue;
-        }else {
-          console.log('Process the line');
-          // Grab and then normalize
-          var ceoData = data[i][6].split(",");
-          var ceoName = ceoData[1].trimLeft() + " " + ceoData[0];
+  var parser = function(line){
+    if (firstLineExists){
+      firstLineExists = false;
+    }else {
+      // This spot is a mess due to file formatting from ICUA
+      var splitLine = line.split(",");
 
-          var cuName = data[i][1];
-          var cuZipcode = data[i][5];
+      var ceoData = line[7].split(",");
 
-          response.push({
-            ceo_name: ceoName,
-            cu_name: cuName,
-            cu_zipcode: cuZipcode
-          });
-        }
-      }
+      var cuName = escapeString(splitLine[1]),
+          cuStreet = escapeString(splitLine[2]),
+          cuCity = escapeString(splitLine[3]),
+          cuState = escapeString(splitLine[4]),
+          cuZipcode = escapeString(splitLine[5]),
+          cuPhone = escapeString(splitLine[8]),
+          cuAssets = escapeString(splitLine[9]);
+
+      // Special case for CEO
+      var ceoFirstName = escapeString(splitLine[7]),
+          ceoLastName = escapeString(splitLine[6]);
+
+      var cuCEO = ceoFirstName.trimLeft() + " " + ceoLastName;
+
+      // Need to use model instead of array
+      response.push({
+        name: cuName,
+        street: cuStreet,
+        city: cuCity,
+        state: cuState,
+        zipcode: cuZipcode,
+        ceo_name: cuCEO,
+        phone_number: cuPhone,
+        assets: cuAssets
+      });
     }
-  });
+  };
 
-  try{
-    var reader = fs.createReadStream(path.join(__dirname, filePath)).pipe(parser);
-    reader.on('end', function(){
+  var lr = new LineByLineReader(path.join(__dirname, filePath))
+    .on('error', function(err){
+      callback(err);
+    })
+    .on('line', parser)
+    .on('end', function(){
       callback(false, response);
     });
-    reader.on('error', function(){
-      // Need to find another way to handle this
-      callback(true);
-    });
-  } catch(err){
-    console.log(err);
-  }
-  
+
 };
 
 var initApi = function(req, res){
@@ -71,27 +84,36 @@ var initApi = function(req, res){
       readFile(filePath, function(err, rows){
         if (err) throw err;
 
-        var data = {
-          success: true,
-          filter: "none",
-          data: rows
-        };
-        res(data);
-        // TODO
-        // Add data
-        // db.collection('credit_unions').insert(data, {}, function(err, records){
-        //   if (err) throw err;
-        //   res('Done!');
-        // });
+        var data = rows;
+
+        db.collection(collectionName).insert(data, {}, function(err, records){
+          if (err) throw err;
+          res(db.collection(collectionName).count());
+        });
       });
     }
   });
 };
 
-var routes = {
+var clearDb = function(req, res){
+  var db = mongoose.connection.db;
+  db.collection('credit_unions').remove();
+  res('cleared collection');
+};
+
+var add = {
   method: 'GET',
   path: '/init',
   handler: initApi
 };
 
-module.exports = routes; 
+var remove = {
+  method: 'GET',
+  path: '/cleardb',
+  handler: clearDb
+};
+
+module.exports = {
+  add: add,
+  remove: remove
+};

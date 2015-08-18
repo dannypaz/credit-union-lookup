@@ -16,7 +16,8 @@ var init = require('./routes/init');
 
 server.route(home);
 server.route(api);
-server.route(init);
+server.route(init.add);
+server.route(init.remove);
 
 var serverConfig = [
   config.good,
