@@ -39,8 +39,10 @@ var initApi = function(req,res){
     // TODO
     // Add data
     var db = req.server.plugins['hapi-mongodb'].db;
-
-    res('Done!');
+    db.collection('credit_unions').insert(data, {}, function(err, records){
+      if (err) throw err;
+      res('Done!');
+    });
   });
 };
 
