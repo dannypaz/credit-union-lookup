@@ -1,6 +1,6 @@
 'use strict';
 
-var cu_data = function(req,res){
+var getCreditUnionData = function(req,res){
   var db = req.server.plugins['hapi-mongodb'].db;
 
   db.collection('credit_unions').findAll(function(err, rows){
@@ -13,7 +13,7 @@ var cu_data = function(req,res){
 var routes = {
   method: 'GET',
   path: '/api',
-  handler: getApi
+  handler: getCreditUnionData
 };
 
 module.exports = routes; 

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/dannypaz/credit-union-lookup",
   "dependencies": {
+    "csv-parse": "^1.0.0",
     "good": "^6.3.0",
     "good-console": "^5.0.2",
     "hapi": "^8.8.1",
