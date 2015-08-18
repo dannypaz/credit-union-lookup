@@ -1,14 +1,20 @@
 'use strict';
 
-var getCreditUnionData = function(req,res){
-  var db = req.server.plugins['hapi-mongodb'].db;
+var mongoose = require('mongoose');
 
-  res('done');
-  // db.collection('credit_unions').findAll(function(err, rows){
-  //   if (err) res.send('error');
-  //   // return all data here
-  //   res('done');
-  // });
+var getCreditUnionData = function(req,res){
+  // Need to convert this to model
+  var db = mongoose.connection.db;
+  var collectionName = 'credit_unions';
+
+  var response = [];
+  var stream = db.collection(collectionName).find().stream()
+    .on('data', function(row){
+      response.push(row);
+    })
+    .on('close', function(){
+      res(response);
+    });
 };
 
 var routes = {
