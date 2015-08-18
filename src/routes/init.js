@@ -2,6 +2,7 @@
 
 // This section will initalize all data from the CSV
 // in ./data/cu.txt to Mongo (or your configured database)
+var mongoose = require('mongoose');
 var fs = require('fs');
 var parse = require('csv-parse');
 
@@ -12,6 +13,7 @@ var readFile = function(path, callback){
     delimiter: ',',
     newline: '\n'
   };
+
   var parser = parse(parseOptions, function(err, data){
     if (skipFirstLine === true){
       skipFirstLine = false;
@@ -37,26 +39,35 @@ var readFile = function(path, callback){
   });
 };
 
-var initApi = function(req,res){
-  //read file
+var initApi = function(req, res){
+  // Put these in config
   var filePath = "../data/cu.txt";
+  var collectionName = 'credit_unions';
 
-  readFile(filePath, function(err, res){
-    var data = res; // This is array prettyfied
-
-    // TODO
-    // Add data
-    var db = req.server.plugins['hapi-mongodb'].db;
-    db.collection('credit_unions').insert(data, {}, function(err, records){
-      if (err) throw err;
-      res('Done!');
-    });
+  var db = mongoose.connection.db;
+  db.createCollection(collectionName, {strict: true}, function(err, collection){
+    if (err){
+      // Just log if this errors
+      // Non critical for init
+      console.log(err);
+      res('Data initialize already completed!');
+    }else {
+      readFile(filePath, function(err, rows){
+        var data = rows;
+        // TODO
+        // Add data
+        db.collection('credit_unions').insert(data, {}, function(err, records){
+          if (err) throw err;
+          res('Done!');
+        });
+      });
+    }
   });
 };
 
 var routes = {
   method: 'GET',
-  path: '/api/init',
+  path: '/init',
   handler: initApi
 };
 

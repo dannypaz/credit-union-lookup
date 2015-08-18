@@ -2,6 +2,7 @@
 
 var Hapi = require('hapi');
 var config = require('./config/config');
+var Mongoose = require('mongoose');
 
 var server = new Hapi.Server();
 
